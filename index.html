@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a17">
+<title>FallSlot · share a calendar link · without the £2,400 bill</title>
+<meta name="description" content="Calendly charges $16/user/month to send a link to a calendar. FallSlot does the same thing in one HTML file for £0. Your data your device.">
+<link rel="manifest" href='data:application/manifest+json,{"name":"FallSlot","short_name":"FallSlot","start_url":".","display":"standalone","background_color":"#1a1a17","theme_color":"#e8a012","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 fill=%22%231a1a17%22/><rect x=%2212%22 y=%2216%22 width=%2240%22 height=%2236%22 rx=%224%22 fill=%22none%22 stroke=%22%23e8a012%22 stroke-width=%223%22/><line x1=%2222%22 y1=%2210%22 x2=%2222%22 y2=%2222%22 stroke=%22%23e8a012%22 stroke-width=%223%22 stroke-linecap=%22round%22/><line x1=%2242%22 y1=%2210%22 x2=%2242%22 y2=%2222%22 stroke=%22%23e8a012%22 stroke-width=%223%22 stroke-linecap=%22round%22/><circle cx=%2232%22 cy=%2236%22 r=%224%22 fill=%22%23e8a012%22/></svg>","sizes":"any","type":"image/svg+xml"}]}'>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #1a1a17;
+  --bg-2: #23231f;
+  --bg-3: #2d2d28;
+  --line: #3a3a33;
+  --text: #f5f1e8;
+  --muted: #948f80;
+  --gold: #e8a012;
+  --gold-dim: #b87d0d;
+  --green: #44aa44;
+  --red: #ff4444;
+  --r: 12px;
+}
+html, body { background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; min-height: 100dvh; -webkit-font-smoothing: antialiased; }
+body { padding-bottom: env(safe-area-inset-bottom); }
+h1, h2, h3 { font-family: 'Syne', system-ui, sans-serif; font-weight: 700; letter-spacing: -0.02em; }
+h1 { font-size: 24px; }
+h2 { font-size: 18px; }
+h3 { font-size: 14px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.06em; }
+
+header { padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 50; backdrop-filter: blur(8px); }
+.top { display: flex; align-items: center; justify-content: space-between; max-width: 1000px; margin: 0 auto; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark { width: 40px; height: 40px; background: var(--gold); border-radius: 8px; display: grid; place-items: center; color: #1a1a17; font-family: 'Syne'; font-weight: 800; font-size: 20px; }
+.brand-name { font-family: 'Syne'; font-weight: 800; font-size: 18px; }
+.brand-sub { color: var(--muted); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.icon-btn { background: var(--bg-2); border: 1px solid var(--line); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; }
+
+main { padding: 20px 16px 100px; max-width: 1000px; margin: 0 auto; }
+.view { display: none; }
+.view.active { display: block; }
+
+.card { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; margin-bottom: 16px; }
+.card-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+
+.field { margin-bottom: 12px; }
+.field label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.field input, .field select, .field textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--text); padding: 12px; border-radius: 8px; font-size: 15px; font-family: inherit; }
+.field input:focus { outline: 2px solid var(--gold); outline-offset: -1px; }
+.field textarea { min-height: 80px; resize: vertical; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+
+.btn { background: var(--gold); color: #1a1a17; border: none; padding: 14px 18px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; width: 100%; }
+.btn:hover { background: var(--gold-dim); }
+.btn:active { transform: scale(0.98); }
+.btn.secondary { background: var(--bg-3); color: var(--text); border: 1px solid var(--line); }
+.btn.green { background: var(--green); color: #fff; }
+.btn.small { padding: 8px 14px; font-size: 13px; width: auto; }
+
+/* days of week toggle */
+.dow-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 10px; }
+.dow-btn { background: var(--bg-3); border: 1px solid var(--line); color: var(--muted); padding: 10px 4px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; text-align: center; }
+.dow-btn.active { background: var(--gold); color: #1a1a17; border-color: var(--gold); font-weight: 700; }
+
+/* booking grid */
+.slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.slot { background: var(--bg-3); border: 1px solid var(--line); border-radius: 6px; padding: 10px 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; }
+.slot:hover { border-color: var(--gold); color: var(--gold); }
+.slot.selected { background: var(--gold); color: #1a1a17; border-color: var(--gold); }
+.slot.disabled { opacity: 0.35; cursor: not-allowed; text-decoration: line-through; }
+
+.day-block { margin-bottom: 18px; }
+.day-block h3 { color: var(--gold); margin-bottom: 8px; font-size: 13px; }
+
+/* booked items */
+.booked-item { background: var(--bg-3); border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.booked-item .when { color: var(--gold); font-weight: 700; font-size: 14px; }
+.booked-item .who { color: var(--text); margin: 4px 0; }
+.booked-item .meta { color: var(--muted); font-size: 12px; }
+.booked-item .actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* tabs */
+nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-2); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px 4px calc(8px + env(safe-area-inset-bottom)); z-index: 60; }
+.tab { background: none; border: none; color: var(--muted); padding: 10px 4px; font-size: 11px; font-family: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.tab.active { color: var(--gold); }
+.tab .ic { font-size: 18px; }
+
+/* public booking page */
+.booking-link { background: rgba(232,160,18,0.08); border: 1px dashed var(--gold); padding: 12px 14px; border-radius: 8px; margin: 12px 0; font-family: ui-monospace, "SF Mono", monospace; font-size: 13px; word-break: break-all; cursor: pointer; }
+.booking-link:hover { background: rgba(232,160,18,0.15); }
+
+.public-hero { text-align: center; padding: 24px 16px; }
+.public-hero h1 { font-size: 28px; margin-bottom: 6px; }
+.public-hero p { color: var(--muted); }
+
+/* modal */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: none; align-items: flex-end; }
+.modal-bg.open { display: flex; }
+.modal { background: var(--bg-2); width: 100%; max-width: 720px; margin: 0 auto; border-radius: 16px 16px 0 0; padding: 22px; max-height: 90vh; overflow-y: auto; padding-bottom: calc(22px + env(safe-area-inset-bottom)); }
+.modal-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.modal-close { background: none; border: none; color: var(--muted); font-size: 28px; cursor: pointer; padding: 0 8px; line-height: 1; }
+
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #1a1a17; padding: 10px 20px; border-radius: 24px; font-weight: 700; z-index: 200; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+footer { text-align: center; padding: 24px 16px; color: var(--muted); font-size: 11px; }
+footer a { color: var(--gold); text-decoration: none; }
+
+.empty { text-align: center; padding: 36px 20px; color: var(--muted); }
+.empty .icon { font-size: 40px; opacity: 0.4; margin-bottom: 10px; }
+
+.tag { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; background: var(--bg-3); color: var(--muted); margin-right: 4px; }
+.tag.gold { color: var(--gold); }
+.tag.green { color: var(--green); }
+.row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.row:last-child { border-bottom: none; }
+.row .lbl { color: var(--muted); }
+.row .val { font-weight: 600; }
+
+.muted { color: var(--muted); }
+.hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <div class="brand">
+      <div class="brand-mark">⏱</div>
+      <div>
+        <div class="brand-name">FallSlot</div>
+        <div class="brand-sub">share a calendar link · sovereign</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="icon-btn" id="btnTier">offline</button>
+      <button class="icon-btn" id="btnSettings">⚙</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- BOOKING (your public link) -->
+<section class="view active" id="view-booking">
+  <div class="card">
+    <h2>Your booking page</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">This is what people see when you share your link. Pick a slot to test it.</p>
+    <div id="publicHero" class="public-hero" style="padding:14px 0">
+      <h1 id="publicTitle">Book a time</h1>
+      <p id="publicSub">with <b id="publicName">your name</b> · <span id="publicDuration">30</span> min</p>
+    </div>
+    <div id="slotsContainer"></div>
+    <div id="bookingForm" style="display:none">
+      <h3 style="margin:18px 0 8px">Selected · <span id="selectedSlot" style="color:var(--gold)">—</span></h3>
+      <div class="field"><label>Name</label><input id="bkName" placeholder="Their name"></div>
+      <div class="field"><label>Email</label><input id="bkEmail" type="email" placeholder="email@example.com"></div>
+      <div class="field"><label>Notes (optional)</label><textarea id="bkNotes" placeholder="What they want to discuss"></textarea></div>
+      <button class="btn green" onclick="confirmBooking()">✓ Confirm booking</button>
+      <p class="hint">They'll get a calendar invite via .ics download. You get notified via the booked tab.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AVAILABILITY -->
+<section class="view" id="view-rules">
+  <div class="card">
+    <h2>Your availability</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:14px">Define when people can book. Same rules every week. Override individual days under Booked → block dates.</p>
+
+    <div class="field">
+      <label>Active days</label>
+      <div class="dow-row" id="dowRow">
+        <button class="dow-btn" data-d="0">Sun</button>
+        <button class="dow-btn active" data-d="1">Mon</button>
+        <button class="dow-btn active" data-d="2">Tue</button>
+        <button class="dow-btn active" data-d="3">Wed</button>
+        <button class="dow-btn active" data-d="4">Thu</button>
+        <button class="dow-btn active" data-d="5">Fri</button>
+        <button class="dow-btn" data-d="6">Sat</button>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field"><label>Start of day</label><input id="dayStart" type="time" value="09:00"></div>
+      <div class="field"><label>End of day</label><input id="dayEnd" type="time" value="17:00"></div>
+    </div>
+
+    <div class="field-row">
+      <div class="field"><label>Slot length (min)</label>
+        <select id="slotLen">
+          <option value="15">15 min</option>
+          <option value="30" selected>30 min</option>
+          <option value="45">45 min</option>
+          <option value="60">60 min</option>
+          <option value="90">90 min</option>
+        </select>
+      </div>
+      <div class="field"><label>Buffer between slots (min)</label>
+        <select id="slotBuffer">
+          <option value="0" selected>0 (back-to-back)</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field"><label>Min notice (hours)</label><input id="minNotice" type="number" min="0" value="2"></div>
+      <div class="field"><label>How far ahead (days)</label><input id="maxAhead" type="number" min="1" max="60" value="14"></div>
+    </div>
+
+    <button class="btn" onclick="saveRules()">Save availability</button>
+  </div>
+
+  <div class="card">
+    <h2>Block specific dates</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">Holidays, focus days, anything you don't want bookable.</p>
+    <div class="field"><label>Add a blocked date</label><input id="blockDate" type="date"></div>
+    <button class="btn small secondary" onclick="addBlockDate()">+ Block this date</button>
+    <div id="blockList" style="margin-top:12px"></div>
+  </div>
+</section>
+
+<!-- BOOKED -->
+<section class="view" id="view-booked">
+  <div class="card">
+    <div class="card-hd"><h2>Booked</h2></div>
+    <div id="bookedList"></div>
+  </div>
+</section>
+
+<!-- SHARE -->
+<section class="view" id="view-share">
+  <div class="card">
+    <h2>Share your link</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">Paste this anywhere — email signature, LinkedIn, business card. Anyone with the link can book.</p>
+    <div class="booking-link" id="shareLink" onclick="copyShareLink()">Loading...</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn small" onclick="copyShareLink()">📋 Copy link</button>
+      <button class="btn small secondary" onclick="copySignature()">📧 Email signature</button>
+      <button class="btn small secondary" onclick="exportAll()">📥 Backup all data</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>What you save vs Calendly</h2>
+    <div class="row"><span class="lbl">Calendly Teams (10 people · year)</span><span class="val" style="color:var(--red)">$2,400</span></div>
+    <div class="row"><span class="lbl">+ SSO add-on ($36/user/yr)</span><span class="val" style="color:var(--red)">$360</span></div>
+    <div class="row"><span class="lbl">+ Year 2 renewal hike (~5%)</span><span class="val" style="color:var(--red)">$138</span></div>
+    <div class="row"><span class="lbl"><b>Calendly year 1</b></span><span class="val" style="color:var(--red);font-size:18px">$2,760</span></div>
+    <div class="row"><span class="lbl">FallSlot</span><span class="val" style="color:var(--green)">£0</span></div>
+    <div class="row"><span class="lbl"><b>You save</b></span><span class="val" style="color:var(--green);font-size:22px;font-family:'Syne'">$2,760+</span></div>
+  </div>
+</section>
+
+<footer>
+  FallSlot · ◊·κ=1 · single HTML · on-device · prime 263 · <a href="https://github.com/sjgant80-hub/fallslot" target="_blank">source</a>
+</footer>
+
+</main>
+
+<nav>
+  <button class="tab active" data-view="booking"><span class="ic">📅</span>Booking</button>
+  <button class="tab" data-view="rules"><span class="ic">⚙</span>Rules</button>
+  <button class="tab" data-view="booked"><span class="ic">✓</span>Booked</button>
+  <button class="tab" data-view="share"><span class="ic">🔗</span>Share</button>
+</nav>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-hd">
+      <h2 id="modalTitle">·</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">·</div>
+
+<script>
+'use strict';
+
+const VERSION = '1.0.0';
+const PRIME = 263;
+const STORE = 'fallslot-state';
+
+let state = {
+  rules: {
+    days: [1, 2, 3, 4, 5],
+    dayStart: '09:00',
+    dayEnd: '17:00',
+    slotLen: 30,
+    slotBuffer: 0,
+    minNoticeHrs: 2,
+    maxAheadDays: 14,
+    blockedDates: [],
+  },
+  bookings: [],
+  settings: {
+    yourName: 'Simon',
+    yourEmail: '',
+    yourTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    eventTitle: 'Book a time',
+    eventDescription: 'A meeting with Simon',
+    anthropicKey: '', openaiKey: '', geminiKey: '', openrouterKey: '',
+  },
+  meta: { created: Date.now(), version: VERSION },
+};
+
+async function saveState() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+async function loadState() { try { const raw = localStorage.getItem(STORE); if (raw) state = Object.assign(state, JSON.parse(raw)); } catch (e) {} }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._to);
+  t._to = setTimeout(() => t.classList.remove('show'), 1800);
+}
+function escHTML(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+// ═══ CASCADE shim (estate-standard) ═══
+const Cascade = {
+  async detectTier() {
+    if (await Cascade._probeLocal()) return 'T2';
+    const s = state.settings;
+    if (s.anthropicKey || s.openaiKey || s.geminiKey || s.openrouterKey) return 'T3';
+    return 'T0';
+  },
+  async _probeLocal() {
+    if (Cascade._localProbed !== undefined) return Cascade._localProbed;
+    try {
+      const r = await Promise.race([
+        fetch('http://127.0.0.1:11434/api/tags').then(r => r.ok),
+        new Promise(res => setTimeout(() => res(false), 400)),
+      ]);
+      Cascade._localProbed = !!r;
+    } catch (e) { Cascade._localProbed = false; }
+    return Cascade._localProbed;
+  },
+};
+
+const KCC = {
+  log(ring, action, w = 1) {
+    state.kcc = (state.kcc || []).concat([{ ts: Date.now(), ring, action, w }]).slice(-500);
+    saveState();
+    try { new BroadcastChannel('fall-signal').postMessage({ source: 'fallslot', type: 'kcc', ring, action, w, ts: Date.now() }); } catch (e) {}
+  },
+};
+
+// ═══ VIEW ROUTER ═══
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+  if (name === 'booking') renderBookingPage();
+  if (name === 'rules') renderRules();
+  if (name === 'booked') renderBooked();
+  if (name === 'share') renderShare();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchView(t.dataset.view)));
+
+// ═══════════════════════════════════════════
+// AGENT α · SLOT GENERATOR
+// generates available slots based on rules
+// ═══════════════════════════════════════════
+function generateSlots() {
+  const r = state.rules;
+  const now = new Date();
+  const minBookable = new Date(now.getTime() + r.minNoticeHrs * 3600000);
+  const maxBookable = new Date(now.getTime() + r.maxAheadDays * 86400000);
+  const [startH, startM] = r.dayStart.split(':').map(Number);
+  const [endH, endM] = r.dayEnd.split(':').map(Number);
+  const step = r.slotLen + r.slotBuffer;
+
+  const days = [];
+  const cursor = new Date(now);
+  cursor.setHours(0, 0, 0, 0);
+  while (cursor <= maxBookable) {
+    const dow = cursor.getDay();
+    const dateStr = cursor.toISOString().slice(0, 10);
+    if (r.days.includes(dow) && !r.blockedDates.includes(dateStr)) {
+      const slots = [];
+      const dayStart = new Date(cursor); dayStart.setHours(startH, startM, 0, 0);
+      const dayEnd = new Date(cursor); dayEnd.setHours(endH, endM, 0, 0);
+      let t = new Date(dayStart);
+      while (t.getTime() + r.slotLen * 60000 <= dayEnd.getTime()) {
+        if (t >= minBookable && t <= maxBookable) {
+          const slotIso = t.toISOString();
+          const isBooked = state.bookings.some(b => b.slot === slotIso);
+          slots.push({
+            iso: slotIso,
+            label: t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+            booked: isBooked,
+          });
+        }
+        t = new Date(t.getTime() + step * 60000);
+      }
+      if (slots.length) days.push({
+        date: dateStr,
+        label: cursor.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' }),
+        slots,
+      });
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return days;
+}
+
+// ═══════════════════════════════════════════
+// RENDER · BOOKING PAGE (public view)
+// ═══════════════════════════════════════════
+let selectedSlotIso = null;
+
+function renderBookingPage() {
+  document.getElementById('publicTitle').textContent = state.settings.eventTitle || 'Book a time';
+  document.getElementById('publicName').textContent = state.settings.yourName || 'your name';
+  document.getElementById('publicDuration').textContent = state.rules.slotLen;
+  const days = generateSlots();
+  const container = document.getElementById('slotsContainer');
+  if (!days.length) {
+    container.innerHTML = '<div class="empty"><div class="icon">📅</div><h3 style="color:var(--text)">No slots available</h3><p>Open Rules and set your availability.</p></div>';
+    return;
+  }
+  container.innerHTML = days.slice(0, 14).map(d => `
+    <div class="day-block">
+      <h3>${escHTML(d.label)}</h3>
+      <div class="slot-grid">
+        ${d.slots.map(s => `<div class="slot ${s.booked ? 'disabled' : ''}" data-iso="${s.iso}" onclick="pickSlot('${s.iso}', this)">${s.label}${s.booked ? ' ✗' : ''}</div>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('bookingForm').style.display = 'none';
+  selectedSlotIso = null;
+}
+
+function pickSlot(iso, el) {
+  if (el.classList.contains('disabled')) return;
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlotIso = iso;
+  const d = new Date(iso);
+  document.getElementById('selectedSlot').textContent = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' }) + ' · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('bookingForm').style.display = 'block';
+  setTimeout(() => document.getElementById('bookingForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+async function confirmBooking() {
+  if (!selectedSlotIso) return;
+  const name = document.getElementById('bkName').value.trim();
+  const email = document.getElementById('bkEmail').value.trim();
+  const notes = document.getElementById('bkNotes').value.trim();
+  if (!name || !email) { toast('Name and email required'); return; }
+  const booking = {
+    id: uid(),
+    slot: selectedSlotIso,
+    duration: state.rules.slotLen,
+    name, email, notes,
+    bookedAt: Date.now(),
+  };
+  state.bookings.push(booking);
+  await saveState();
+  KCC.log('R3', 'booking_confirmed', 3);
+  try { new BroadcastChannel('fall-signal').postMessage({ source: 'fallslot', type: 'booking', booking, ts: Date.now() }); } catch (e) {}
+  // Generate .ics and trigger download
+  downloadICS(booking);
+  // Also email the host via mailto: (opens their mail client)
+  const hostEmail = state.settings.yourEmail;
+  const mailto = hostEmail ? `mailto:${hostEmail}?subject=${encodeURIComponent('Booking · ' + name + ' · ' + new Date(booking.slot).toLocaleString('en-GB'))}&body=${encodeURIComponent('New booking via FallSlot:\n\n' + name + '\n' + email + '\n\n' + new Date(booking.slot).toLocaleString('en-GB') + '\nDuration: ' + booking.duration + ' min\n\nNotes:\n' + notes)}` : null;
+  toast('◊ Booked · invite downloading');
+  document.getElementById('bookingForm').style.display = 'none';
+  selectedSlotIso = null;
+  document.getElementById('bkName').value = '';
+  document.getElementById('bkEmail').value = '';
+  document.getElementById('bkNotes').value = '';
+  if (mailto) setTimeout(() => { window.location.href = mailto; }, 400);
+  setTimeout(renderBookingPage, 200);
+}
+
+// ═══════════════════════════════════════════
+// AGENT β · ICS GENERATOR
+// RFC 5545 compliant calendar invite
+// ═══════════════════════════════════════════
+function buildICS(booking) {
+  const start = new Date(booking.slot);
+  const end = new Date(start.getTime() + booking.duration * 60000);
+  const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//FallSlot//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:REQUEST',
+    'BEGIN:VEVENT',
+    'UID:' + booking.id + '@fallslot',
+    'DTSTAMP:' + fmt(new Date()),
+    'DTSTART:' + fmt(start),
+    'DTEND:' + fmt(end),
+    'SUMMARY:' + icsEscape(state.settings.eventTitle + ' · ' + booking.name),
+    'DESCRIPTION:' + icsEscape((state.settings.eventDescription || '') + (booking.notes ? '\\n\\n' + booking.notes : '')),
+    'ORGANIZER;CN=' + icsEscape(state.settings.yourName) + ':mailto:' + (state.settings.yourEmail || 'noreply@example.com'),
+    'ATTENDEE;CN=' + icsEscape(booking.name) + ';RSVP=TRUE:mailto:' + booking.email,
+    'STATUS:CONFIRMED',
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ];
+  return lines.join('\r\n');
+}
+
+function icsEscape(s) { return String(s || '').replace(/[\\,;]/g, m => '\\' + m).replace(/\n/g, '\\n'); }
+
+function downloadICS(booking) {
+  const text = buildICS(booking);
+  const blob = new Blob([text], { type: 'text/calendar' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `booking-${booking.id}.ics`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// ═══════════════════════════════════════════
+// RENDER · RULES
+// ═══════════════════════════════════════════
+function renderRules() {
+  document.querySelectorAll('.dow-btn').forEach(b => {
+    const d = +b.dataset.d;
+    b.classList.toggle('active', state.rules.days.includes(d));
+    b.onclick = () => {
+      if (state.rules.days.includes(d)) state.rules.days = state.rules.days.filter(x => x !== d);
+      else state.rules.days = [...state.rules.days, d].sort();
+      b.classList.toggle('active');
+    };
+  });
+  document.getElementById('dayStart').value = state.rules.dayStart;
+  document.getElementById('dayEnd').value = state.rules.dayEnd;
+  document.getElementById('slotLen').value = state.rules.slotLen;
+  document.getElementById('slotBuffer').value = state.rules.slotBuffer;
+  document.getElementById('minNotice').value = state.rules.minNoticeHrs;
+  document.getElementById('maxAhead').value = state.rules.maxAheadDays;
+  renderBlockList();
+}
+
+async function saveRules() {
+  state.rules.dayStart = document.getElementById('dayStart').value;
+  state.rules.dayEnd = document.getElementById('dayEnd').value;
+  state.rules.slotLen = +document.getElementById('slotLen').value;
+  state.rules.slotBuffer = +document.getElementById('slotBuffer').value;
+  state.rules.minNoticeHrs = +document.getElementById('minNotice').value;
+  state.rules.maxAheadDays = +document.getElementById('maxAhead').value;
+  await saveState();
+  toast('Saved');
+}
+
+function renderBlockList() {
+  const root = document.getElementById('blockList');
+  if (!state.rules.blockedDates.length) { root.innerHTML = '<div class="muted" style="font-size:13px">No blocked dates.</div>'; return; }
+  root.innerHTML = state.rules.blockedDates.sort().map(d => `
+    <div class="row"><span class="lbl">${new Date(d).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}</span>
+    <span><button class="icon-btn" onclick="unblockDate('${d}')">✕ unblock</button></span></div>`).join('');
+}
+
+async function addBlockDate() {
+  const d = document.getElementById('blockDate').value;
+  if (!d) { toast('Pick a date'); return; }
+  if (!state.rules.blockedDates.includes(d)) state.rules.blockedDates.push(d);
+  await saveState();
+  renderBlockList();
+  toast('Blocked');
+}
+
+async function unblockDate(d) {
+  state.rules.blockedDates = state.rules.blockedDates.filter(x => x !== d);
+  await saveState();
+  renderBlockList();
+}
+
+// ═══════════════════════════════════════════
+// RENDER · BOOKED
+// ═══════════════════════════════════════════
+function renderBooked() {
+  const root = document.getElementById('bookedList');
+  const now = Date.now();
+  const upcoming = state.bookings.filter(b => new Date(b.slot).getTime() > now).sort((a, b) => new Date(a.slot) - new Date(b.slot));
+  const past = state.bookings.filter(b => new Date(b.slot).getTime() <= now).sort((a, b) => new Date(b.slot) - new Date(a.slot));
+  if (!state.bookings.length) { root.innerHTML = '<div class="empty"><div class="icon">✓</div><h3 style="color:var(--text)">Nothing booked yet</h3><p>Share your link and people can book a time.</p></div>'; return; }
+  root.innerHTML = `
+    ${upcoming.length ? `<h3 style="margin-bottom:8px">Upcoming · ${upcoming.length}</h3>` : ''}
+    ${upcoming.map(renderBookingItem).join('')}
+    ${past.length ? `<h3 style="margin:18px 0 8px;color:var(--muted)">Past · ${past.length}</h3>` : ''}
+    ${past.slice(0, 20).map(renderBookingItem).join('')}
+  `;
+}
+
+function renderBookingItem(b) {
+  const d = new Date(b.slot);
+  return `
+    <div class="booked-item">
+      <div class="when">${d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })} · ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
+      <div class="who">${escHTML(b.name)} · <a href="mailto:${escHTML(b.email)}" style="color:var(--gold)">${escHTML(b.email)}</a></div>
+      ${b.notes ? `<div class="meta" style="margin-top:6px">"${escHTML(b.notes)}"</div>` : ''}
+      <div class="meta" style="margin-top:6px">${b.duration} min · booked ${new Date(b.bookedAt).toLocaleDateString('en-GB')}</div>
+      <div class="actions">
+        <button class="icon-btn" onclick="downloadBookingICS('${b.id}')">📅 .ics</button>
+        <button class="icon-btn" onclick="cancelBooking('${b.id}')">✕ cancel</button>
+      </div>
+    </div>`;
+}
+
+function downloadBookingICS(id) {
+  const b = state.bookings.find(x => x.id === id);
+  if (b) downloadICS(b);
+}
+
+async function cancelBooking(id) {
+  if (!confirm('Cancel this booking?')) return;
+  state.bookings = state.bookings.filter(b => b.id !== id);
+  await saveState();
+  renderBooked();
+  toast('Cancelled');
+}
+
+// ═══════════════════════════════════════════
+// RENDER · SHARE
+// ═══════════════════════════════════════════
+function renderShare() {
+  document.getElementById('shareLink').textContent = location.href.split('?')[0];
+}
+
+function copyShareLink() {
+  const link = location.href.split('?')[0];
+  navigator.clipboard.writeText(link).then(() => toast('Link copied'));
+  KCC.log('R4', 'share', 1);
+}
+
+function copySignature() {
+  const name = state.settings.yourName;
+  const link = location.href.split('?')[0];
+  const sig = `${name}\nBook a time with me: ${link}`;
+  navigator.clipboard.writeText(sig).then(() => toast('Signature copied'));
+}
+
+function exportAll() {
+  const data = JSON.stringify({ exported: new Date().toISOString(), version: VERSION, state }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fallslot-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('Backup downloaded');
+}
+
+// ═══════════════════════════════════════════
+// SETTINGS MODAL
+// ═══════════════════════════════════════════
+function showModal(title, body) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+document.getElementById('btnSettings').addEventListener('click', () => {
+  showModal('Settings', `
+    <div class="field"><label>Your name</label><input id="stName" value="${escHTML(state.settings.yourName)}"></div>
+    <div class="field"><label>Your email (notifications go here)</label><input id="stEmail" type="email" value="${escHTML(state.settings.yourEmail)}"></div>
+    <div class="field"><label>Event title (default)</label><input id="stTitle" value="${escHTML(state.settings.eventTitle)}"></div>
+    <div class="field"><label>Event description</label><textarea id="stDesc">${escHTML(state.settings.eventDescription)}</textarea></div>
+
+    <h3 style="margin:18px 0 8px">AI keys (optional · for natural-language booking later)</h3>
+    <p style="color:var(--muted);font-size:12px;margin-bottom:8px">All optional. <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--gold)">Gemini is free</a>. Stays on this device.</p>
+    <div class="field"><label>Anthropic · Claude</label><input id="stAnthropic" type="password" value="${escHTML(state.settings.anthropicKey)}"></div>
+    <div class="field"><label>OpenAI · GPT</label><input id="stOpenAI" type="password" value="${escHTML(state.settings.openaiKey)}"></div>
+    <div class="field"><label>Gemini · free</label><input id="stGemini" type="password" value="${escHTML(state.settings.geminiKey)}"></div>
+    <div class="field"><label>OpenRouter</label><input id="stOpenRouter" type="password" value="${escHTML(state.settings.openrouterKey)}"></div>
+
+    <div style="margin-top:20px;text-align:center;color:var(--muted);font-size:11px">
+      FallSlot · v${VERSION} · ◊·κ=1 · prime ${PRIME}<br>
+      share a calendar link · without the $2,400 bill
+    </div>
+    <div style="margin-top:14px"><button class="btn" onclick="saveSettings()">Save</button></div>
+  `);
+});
+
+async function saveSettings() {
+  state.settings.yourName = document.getElementById('stName').value || 'Simon';
+  state.settings.yourEmail = document.getElementById('stEmail').value;
+  state.settings.eventTitle = document.getElementById('stTitle').value || 'Book a time';
+  state.settings.eventDescription = document.getElementById('stDesc').value;
+  state.settings.anthropicKey = document.getElementById('stAnthropic').value;
+  state.settings.openaiKey = document.getElementById('stOpenAI').value;
+  state.settings.geminiKey = document.getElementById('stGemini').value;
+  state.settings.openrouterKey = document.getElementById('stOpenRouter').value;
+  Cascade._localProbed = undefined;
+  await saveState();
+  await updateTierBadge();
+  closeModal();
+  renderBookingPage();
+  toast('Saved');
+}
+
+async function updateTierBadge() {
+  const tier = await Cascade.detectTier();
+  document.getElementById('btnTier').textContent = tier === 'T0' ? 'offline' : tier;
+}
+
+// ═══ KONOMI ═══
+window.KONOMI = { active: true, tier: 'sovereign', check: () => ({ ok: true, tier: 'sovereign' }) };
+
+// ═══ FALLMESH ═══
+try {
+  const sig = new BroadcastChannel('fall-signal');
+  sig.postMessage({ source: 'fallslot', type: 'hello', prime: PRIME, version: VERSION, ts: Date.now() });
+  sig.addEventListener('message', e => {
+    const m = e.data;
+    if (m && m.type === 'ping') sig.postMessage({ source: 'fallslot', type: 'pong', prime: PRIME });
+  });
+} catch (e) {}
+
+// ═══ postMessage API ═══
+window.addEventListener('message', async (e) => {
+  const m = e.data;
+  if (!m || m.target !== 'fallslot' || !m.action) return;
+  let resp = null;
+  if (m.action === 'ping') resp = { ok: true, prime: PRIME, version: VERSION };
+  else if (m.action === 'available') resp = generateSlots();
+  else if (m.action === 'bookings') resp = state.bookings;
+  e.source?.postMessage({ target: m.source || '*', responseTo: m.action, data: resp }, '*');
+});
+
+// ═══ BOOT ═══
+(async function init() {
+  await loadState();
+  await updateTierBadge();
+  renderBookingPage();
+})();
+</script>
+</body>
+</html>
