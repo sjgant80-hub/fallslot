@@ -1,0 +1,32 @@
+[
+  {
+    "line": 126,
+    "mutation": "< → <=",
+    "snippet": "for (let i = 0; i < list.length; i++) {",
+    "reason": "Equivalent. This is the outer loop of existingClashes over an array that has already been filtered to real objects. One extra iteration reads list[list.length], which is undefined; overlaps() then reads .slot and .duration off it through guards that return false for anything that is not a usable time and length, so no pair is ever produced. The inner loop starts at i+1, which is past the end on that iteration, so its body never runs either. The behaviour that matters — that a genuine collision is found and a clean diary reports nothing — is asserted directly in section 7."
+  },
+  {
+    "line": 127,
+    "mutation": "< → <=",
+    "snippet": "for (let j = i + 1; j < list.length; j++) {",
+    "reason": "Equivalent, for the same reason one level in. The extra iteration compares a real booking against list[list.length], which is undefined, and overlaps() returns false for it because timeOf and lengthOf both yield null. Nothing can be pushed, so the returned list of clashes is identical either way."
+  },
+  {
+    "line": 27,
+    "mutation": "|| → &&",
+    "snippet": "if (value == null || value === '') return null;",
+    "reason": "Equivalent, not unguarded. This is the early return in timeOf for a value that is plainly not a time. With && the early return stops firing, but both inputs then fall through to the same answer: null and undefined are not Date instances and not numbers, so they reach Date.parse(String(value)) as \"null\" and \"undefined\", which is NaN and returns null; the empty string likewise parses to NaN and returns null. No input can be made to differ. That an unusable clock refuses every booking rather than guessing is asserted in section 3."
+  },
+  {
+    "line": 49,
+    "mutation": "|| → &&",
+    "snippet": "if (aStart === null || bStart === null || aLen === null || bLen === null) return false;",
+    "reason": "One equivalent case remains on this line after the others were killed by section 9. With && the guard only fires when EVERY part is null, so a missing START can reach the arithmetic — but there it is coerced to 0, and the second half of the comparison then asks whether a real timestamp (about 1.8e12) is less than a few million milliseconds, which is false. The expression therefore still returns false for a booking with no start time, which is the same answer the guard gives. The two cases that were NOT equivalent — a missing DURATION on either side, where the arithmetic invents a zero-length booking and reports a collision — are pinned directly in section 9."
+  },
+  {
+    "line": 49,
+    "mutation": "|| → &&",
+    "snippet": "if (aStart === null || bStart === null || aLen === null || bLen === null) return false;",
+    "reason": "One equivalent case remains on this line after the others were killed by section 9. With && the guard only fires when EVERY part is null, so a missing START can reach the arithmetic — but there it is coerced to 0, and the second half of the comparison then asks whether a real timestamp (about 1.8e12) is less than a few million milliseconds, which is false. The expression therefore still returns false for a booking with no start time, which is the same answer the guard gives. The two cases that were NOT equivalent — a missing DURATION on either side, where the arithmetic invents a zero-length booking and reports a collision — are pinned directly in section 9."
+  }
+]
